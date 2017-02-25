@@ -7,11 +7,11 @@
 //
 
 #import "ViewController.h"
-#import <WebKit/WebKit.h>
-#import "zxcRollingBanner.h"
+
+#import "ZXCRollingBanner.h"
 
 
-@interface ViewController ()<zxcRollingBannerDelegate>
+@interface ViewController ()<ZXCRollingBannerDelegate>
 
 @end
 
@@ -35,7 +35,7 @@
     
     
     CGFloat width =  [UIScreen mainScreen].bounds.size.width;
-    zxcRollingBanner * sc = [[zxcRollingBanner alloc]initWithFrame:CGRectMake(0, 0,width , 200)];
+    ZXCRollingBanner * sc = [[ZXCRollingBanner alloc]initWithFrame:CGRectMake(0, 0,width , 200)];
     sc.delegate = self;
     sc.placeholderImage = [UIImage imageNamed:@"placeholder.jpg"];
     
