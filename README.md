@@ -7,9 +7,9 @@ zxcRollingBanner是一个简单的图片广告滚动视图
 
 ###下载&使用
 
-1.使用时直接将/zxcRollingBanner文件夹拖入目标项目工程即可
+1.使用时直接将/ZXCRollingBanner文件夹拖入目标项目工程即可
 
-2.使用CocoaPods:  Pod 'zxcRollingBanner'
+2.使用CocoaPods:  Pod 'ZXCRollingBanner'
 
 
 ###初始化方法
@@ -106,11 +106,11 @@ zxcRollingBanner是一个简单的图片广告滚动视图
 
 ###注意
 
-1.项目中重复给zxcRollingBanner赋值更新图片是直接调用两个设置数据方法即可,方法调用时会自动清除之前数据
+1.项目中重复给ZXCRollingBanner赋值更新图片是直接调用两个设置数据方法即可,方法调用时会自动清除之前数据
 
 2.Demo下载完整后请先执行pod install
 
-3.zxcRollingBanner部分功能依赖于SDWebImage,若不需要网络加载则可删除相关代码
+3.部分功能依赖于SDWebImage
 
 
 
