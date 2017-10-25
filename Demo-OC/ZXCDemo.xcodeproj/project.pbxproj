@@ -227,6 +227,7 @@
 				TargetAttributes = {
 					F3A086C01DE96A8C000C16BA = {
 						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = AMN7NX2CM5;
 						ProvisioningStyle = Automatic;
 					};
 					F3A086D91DE96A8D000C16BA = {
@@ -294,7 +295,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		D689EFBB19C9C84D912AF4AA /* [CP] Embed Pods Frameworks */ = {
@@ -476,6 +477,7 @@
 			baseConfigurationReference = D4E4B70CE33E07EAB4401F69 /* Pods-ZXCDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = AMN7NX2CM5;
 				INFOPLIST_FILE = ZXCDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = cn.zxc.ZXCDemo;
@@ -488,6 +490,7 @@
 			baseConfigurationReference = 26DA328C301C8B8F1D9962AA /* Pods-ZXCDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = AMN7NX2CM5;
 				INFOPLIST_FILE = ZXCDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = cn.zxc.ZXCDemo;

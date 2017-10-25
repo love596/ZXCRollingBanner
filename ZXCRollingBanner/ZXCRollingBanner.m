@@ -10,16 +10,17 @@
 #import <UIImageView+WebCache.h>
 
 @interface ZXCRollingBanner ()<UIScrollViewDelegate>
+{
+    
+    BOOL _autoScrollStatus;
+}
 
-///
+///视图
 @property ( nonatomic,strong) UIScrollView * scrollView ;
-///
+///分页指示器
 @property ( nonatomic,strong) UIPageControl * pageControl ;
-///
-@property ( nonatomic,strong) NSMutableArray * dataSource ;
-///
-@property ( nonatomic,strong) NSTimer * timer ;
 
+@property ( nonatomic,strong) NSMutableArray * dataSourceUrl ;
 
 @property (nonatomic,copy) void (^scrollBlock) (NSInteger currentIndex);
 
@@ -29,13 +30,12 @@
 
 @implementation ZXCRollingBanner
 
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
         //初始化滚动时间
-        _scrollTime = 3;
+        _scrollTime = 5;
         //创建子视图
         [self buildView];
         
@@ -44,12 +44,7 @@
     return self;
 }
 
-- (void)dealloc
-{
-    if (_timer != nil) {
-        [_timer invalidate];
-    }
-}
+
 
 
 -(void)buildView{
@@ -60,30 +55,33 @@
     
 }
 
-//填充子视图-0  
+
+
+//填充子视图-0
 -(void)setImageWithUrlArr:(NSArray<NSString *> *)urlArr{
     
-    self.dataSource = [NSMutableArray arrayWithArray:urlArr];
+    [self stopScroll];
     
-    self.pageControl.numberOfPages = self.dataSource.count;
-    self.pageControl.currentPage = 0;
+    self.dataSourceUrl = [NSMutableArray arrayWithArray:urlArr];
     
-    for (int i = 0; i< self.dataSource.count+1; i++) {
+    [self removeAllSubviewsFromView:self.scrollView];
+    
+    for (int i = 0; i< self.dataSourceUrl.count+1; i++) {
         
         UIImageView * imgView = [[UIImageView alloc]initWithFrame:CGRectMake(i*self.bounds.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
         
         imgView.contentMode = UIViewContentModeScaleToFill;
         
-        if(i == self.dataSource.count){
+        if(i == self.dataSourceUrl.count){
             
-            [imgView sd_setImageWithURL:[NSURL URLWithString:self.dataSource[0]] placeholderImage:self.placeholderImage options:SDWebImageRefreshCached|SDWebImageAllowInvalidSSLCertificates];
+            [imgView sd_setImageWithURL:[NSURL URLWithString:self.dataSourceUrl[0]] placeholderImage:self.placeholderImage options:SDWebImageAllowInvalidSSLCertificates];
             
             [self.scrollView addSubview:imgView];
             break;
             //最后一项的特殊处理
         }
         
-        [imgView sd_setImageWithURL:[NSURL URLWithString:self.dataSource[i]] placeholderImage:self.placeholderImage options:SDWebImageRefreshCached|SDWebImageAllowInvalidSSLCertificates];
+        [imgView sd_setImageWithURL:[NSURL URLWithString:self.dataSourceUrl[i]] placeholderImage:self.placeholderImage options:SDWebImageAllowInvalidSSLCertificates];
         
         [self.scrollView addSubview:imgView];
         
@@ -91,36 +89,40 @@
         
         
     }
+    self.pageControl.numberOfPages = self.dataSourceUrl.count;
     //显示包含内容大小
-    self.scrollView.contentSize = CGSizeMake((self.dataSource.count+1)*self.bounds.size.width, self.bounds.size.height);
+    self.scrollView.contentSize = CGSizeMake((self.dataSourceUrl.count+1)*self.bounds.size.width, self.bounds.size.height);
     
-    [self delayScroll];
+    self.scrollView.contentOffset = CGPointMake(0, 0);
+    
+    [self beginScroll];
 }
 
 //填充子视图-1
 -(void)setImageWithImgArr:(NSArray<UIImage *> *)imgArr{
     
-    self.dataSource = [NSMutableArray arrayWithArray:imgArr];
+    [self stopScroll];
     
-    self.pageControl.numberOfPages = self.dataSource.count;
-    self.pageControl.currentPage = 0;
+    self.dataSourceUrl = [NSMutableArray arrayWithArray:imgArr];
     
-    for (int i = 0; i< self.dataSource.count+1; i++) {
+    [self removeAllSubviewsFromView:self.scrollView];
+    
+    for (int i = 0; i< self.dataSourceUrl.count+1; i++) {
         
         UIImageView * imgView = [[UIImageView alloc]initWithFrame:CGRectMake(i*self.bounds.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
         
         imgView.contentMode = UIViewContentModeScaleToFill;
         
-        if(i == self.dataSource.count){
+        if(i == self.dataSourceUrl.count){
             
-            imgView.image = self.dataSource[0];
+            imgView.image = self.dataSourceUrl[0];
             
             [self.scrollView addSubview:imgView];
             break;
             //最后一项的特殊处理
         }
         
-        imgView.image = self.dataSource[i];
+        imgView.image = self.dataSourceUrl[i];
         
         
         
@@ -128,10 +130,14 @@
         
         
     }
-    //显示包含内容大小
-    self.scrollView.contentSize = CGSizeMake((self.dataSource.count+1)*self.bounds.size.width, self.bounds.size.height);
     
-    [self delayScroll];
+    self.pageControl.numberOfPages = self.dataSourceUrl.count;
+    //显示包含内容大小
+    self.scrollView.contentSize = CGSizeMake((self.dataSourceUrl.count+1)*self.bounds.size.width, self.bounds.size.height);
+    
+    self.scrollView.contentOffset = CGPointMake(0, 0);
+    
+    [self beginScroll];
     
     
 }
@@ -140,13 +146,7 @@
 
 #pragma mark - 组件方法
 
--(void)delayScroll{
-    //延迟执行
-    __weak typeof(self) weakSelf = self;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [weakSelf.timer setFireDate:[NSDate distantPast]];
-    });
-}
+
 
 -(void)pageing:(UIPageControl *)pgc{
     NSInteger  currentPage = pgc.currentPage;
@@ -155,7 +155,9 @@
 }
 
 
--(void)timerGo:(NSTimer *)timer{
+-(void)timerGo{
+    
+    
     NSInteger currentPage = _scrollView.contentOffset.x / _scrollView.bounds.size.width;
     //修改滚动视图的偏移量
     [self.scrollView setContentOffset:CGPointMake((currentPage+1) * _scrollView.bounds.size.width, 0) animated:YES];
@@ -193,50 +195,71 @@
 
 #pragma mark - 控制事件
 
--(void)start{
-    [self.timer setFireDate:[NSDate distantFuture]];
+
+
+-(void)stopScroll{
     
+    _autoScrollStatus = NO;
+    
+    [[self class] cancelPreviousPerformRequestsWithTarget:self];
 }
 
--(void)stop{
-    [self.timer setFireDate:[NSDate distantPast]];
+-(void)beginScroll{
+    
+    _autoScrollStatus = YES;
+    
+    [self performSelector:@selector(timerGo) withObject:nil afterDelay:self.scrollTime];
     
 }
-
 
 
 #pragma mark - UIScrollViewDelegate
 
 -(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView{
-    //滚动停止
+    
     [self scrollViewDidEndDecelerating:scrollView];
+    
+    
 }
 
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
+    
     NSInteger currentPage = scrollView.contentOffset.x / scrollView.bounds.size.width;
     NSInteger wholePage = scrollView.contentSize.width/scrollView.bounds.size.width;
     
-    if (wholePage == currentPage+1) {
+    if (wholePage <= currentPage+1) {
         currentPage = 0;
         scrollView.contentOffset = CGPointMake(0, 0);
     }
     self.pageControl.currentPage = currentPage;
+    
+
     
     [self.delegate scrollToIndex:currentPage];
     
     if (_scrollBlock) {
         _scrollBlock(currentPage);
     }
+    
+    
+    [self stopScroll];
+    [self beginScroll];
+    
 }
+
+
+
+
 
 #pragma mark - 懒加载
 
--(NSMutableArray*)dataSource{
-    if (_dataSource == nil) {
-        _dataSource = [[NSMutableArray alloc] init];
+-(NSMutableArray*)dataSourceUrl{
+    if (_dataSourceUrl == nil) {
+        _dataSourceUrl = [[NSMutableArray alloc] init];
     }
-    return _dataSource;
+    return _dataSourceUrl;
 }
+
 
 -(UIPageControl*)pageControl{
     if (_pageControl == nil) {
@@ -264,26 +287,21 @@
 }
 
 
--(NSTimer*)timer{
-    if (_timer == nil) {
-        
-        __weak typeof(self) weakSelf = self;
-        
-        _timer = [NSTimer scheduledTimerWithTimeInterval:_scrollTime target:weakSelf selector:@selector(timerGo:) userInfo:nil repeats:YES];
-        
-        [[NSRunLoop currentRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
+- (void)removeAllSubviewsFromView:(UIView *)view {
+    //[self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    while (view.subviews.count) {
+        [view.subviews.lastObject removeFromSuperview];
     }
-    return _timer;
 }
 
 
 
 /*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
+ // Only override drawRect: if you perform custom drawing.
+ // An empty implementation adversely affects performance during animation.
+ - (void)drawRect:(CGRect)rect {
+ // Drawing code
+ }
+ */
 
 @end

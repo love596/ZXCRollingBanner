@@ -46,6 +46,11 @@
  */
 - (instancetype)initWithFrame:(CGRect)frame;
 
+-(void)stopScroll;
+
+-(void)beginScroll;
+
+
 
 /**
  设置图片<UIImage>
@@ -70,7 +75,7 @@
 
 /**
  当前点击的图片回调
-
+ 
  @param block 当前点击的图片回调
  */
 -(void)tapWihtBlock:(void(^)(NSInteger tapIndex))block;
@@ -79,9 +84,10 @@
 
 /**
  当前显示的图片回调
-
+ 
  @param block 当前显示的图片回调
  */
 -(void)scrollWithBlock:(void(^)(NSInteger currentIndex))block;
 
 @end
+
